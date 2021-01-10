@@ -15,7 +15,7 @@ def search_page():
     tag = tag if len(tag) != 0 else 'favorite'
     keyword = request.values['keyword']
     search_result = search_by_grep(tag, keyword)
-    return render_template("index.html", results=search_result)   
+    return render_template("index.html", results=search_result, keyword=keyword)   
 
 def search_by_grep(tag, keyword):
     print('keyword:', keyword)
@@ -26,7 +26,8 @@ def search_by_grep(tag, keyword):
         grep = EpubGrep(keyword)
         grep.setPreview(True)
         grep_result = grep.searchin(book.path)
-        if grep_result != None:
+        print('grep_results:', grep_result)
+        if grep_result != None and grep_result != '':
             results[book] = grep_result
 
     return results
@@ -72,5 +73,5 @@ class Book:
         return '\nid:' + self.id + '\ntitle:' + self.title + '\npath:' + self.path
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
 

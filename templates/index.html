@@ -2,21 +2,28 @@
     <head>
         <title>Search Epub Texts</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <style>
+            body { padding: 60px; }
+            b {font-size: 1.4em;}
+        </style>
     </head>
     <body>
         <!-- Search form -->
         <div class="active-cyan-3 active-cyan-4 mb-4">
             <form action="/s" method="get">
                 <input class="form-control" name="tag" type="text" placeholder="epub tag" aria-label="Search">
-                <input class="form-control" name="keyword" type="text" placeholder="Search Text" aria-label="Search">
+                <input class="form-control" name="keyword" type="text" value="{{ keyword if keyword != None else '' }}" placeholder="Search Text" aria-label="Search">
                 <input type="submit" />
             </form>
         </div>
         <div>
           {% for book in results.keys() %}
           <h1> {{ book.title }}</h1>
-          <pre>{{ results[book] }}</pre>
+            {% for line in results[book].split('\n') %}
+                {{ line.replace(keyword, '<b>' + keyword + '</b>') |safe}} </br>
+            {% endfor %}
           {% endfor %}
+          <p>
         </div>
 
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
