@@ -11,7 +11,8 @@
         <!-- Search form -->
         <div class="active-cyan-3 active-cyan-4 mb-4">
             <form action="/s" method="get">
-                <input class="form-control" name="tag" type="text" placeholder="epub tag" aria-label="Search">
+                <input class="form-control" name="tag" type="text" value="{{ tag if tag != None else '' }}"placeholder="epub tag" aria-label="Search">
+                <input class="form-control" name="context" type="text" placeholder="how many characters to be displayed (default:120)" value="{{ context if context != None else '120' }}" aria-label="Search">
                 <input class="form-control" name="keyword" type="text" value="{{ keyword if keyword != None else '' }}" placeholder="Search Text" aria-label="Search">
                 <input type="submit" />
             </form>

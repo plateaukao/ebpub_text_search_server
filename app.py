@@ -13,20 +13,24 @@ def hello():
 def search_page():
     tag = request.values['tag']
     tag = tag if len(tag) != 0 else 'favorite'
+    context = request.values['context']
     keyword = request.values['keyword']
-    search_result = search_by_grep(tag, keyword)
-    return render_template("index.html", results=search_result, keyword=keyword)   
+    search_result = search_by_grep(tag, context, keyword)
+    return render_template("index.html", results=search_result, tag = tag, context = context, keyword = keyword)   
 
-def search_by_grep(tag, keyword):
-    print('keyword:', keyword)
+def search_by_grep(tag, context, keyword):
+    #print('keyword:', keyword)
     books = search_books(tag)
 
     results = {}
     for book in books:
         grep = EpubGrep(keyword)
         grep.setPreview(True)
+        if context != None and context != '':
+            grep.setPreviewLead(int(context))
+            grep.setPreviewLag(int(context))
         grep_result = grep.searchin(book.path)
-        print('grep_results:', grep_result)
+        #print('grep_results:', grep_result)
         if grep_result != None and grep_result != '':
             results[book] = grep_result
 
