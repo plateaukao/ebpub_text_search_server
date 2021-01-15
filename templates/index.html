@@ -1,34 +1,97 @@
 <html>
-    <head>
-        <title>Search Epub Texts</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <style>
-            body { padding: 60px; }
-            b {font-size: 1.4em;}
-        </style>
-    </head>
-    <body>
-        <!-- Search form -->
-        <div class="active-cyan-3 active-cyan-4 mb-4">
-            <form action="/s" method="get">
-                <input class="form-control" name="tag" type="text" value="{{ tag if tag != None else '' }}"placeholder="epub tag" aria-label="Search">
-                <input class="form-control" name="context" type="text" placeholder="how many characters to be displayed (default:120)" value="{{ context if context != None else '120' }}" aria-label="Search">
-                <input class="form-control" name="keyword" type="text" value="{{ keyword if keyword != None else '' }}" placeholder="Search Text" aria-label="Search">
-                <input type="submit" />
-            </form>
-        </div>
-        <div>
-          {% for book in results.keys() %}
-          <h1> {{ book.title }}</h1>
-            {% for line in results[book].split('\n') %}
-                {{ line.replace(keyword, '<b>' + keyword + '</b>') |safe}} </br>
-            {% endfor %}
-          {% endfor %}
-          <p>
-        </div>
 
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-      </body>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Epub Texts</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        b {
+            font-size: 1.4em;
+        }
+
+        header.fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px;
+        }
+
+        hr {
+            border: 2px solid black;
+        }
+
+        html {
+            --top-spacing: 125px;
+        }
+
+        body {
+            scroll-padding-top: var(--top-spacing);
+            margin: var(--top-spacing) auto;
+            max-width: 800px;
+            padding: 0 20px;
+            font-size: 120%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Search form -->
+    <header class="fixed">
+        <form action="/s" method="get">
+            <input name="tag" type="text" value="{{ tag if tag != None else '' }}" placeholder="epub tag" size="10">
+            <input name="context" type="text" placeholder="context(120)"
+                value="{{ context if context != None else '120' }}" size="6">
+            <input name="keyword" type="text" value="{{ keyword if keyword != None else '' }}" placeholder="Search Text"
+                size="10">
+            <input type="submit" />
+        <!-- </form> <button id="increase"> [+] </button> <button id="decrease"> [-] </button> -->
+        <div style="padding-top: 20px;">
+            {% for book in results.keys() %}
+            <a href={{ '#b' + book.id }}><button type="button">{{ book.title }}</button></a>
+            {% endfor %}
+        </div>
+    </header>
+    <div class="container">
+        {% for book in results.keys() %}
+            <h1 id="{{ 'b' + book.id}}" style="padding-top: 125px;">{{ book.title }}</h1>
+            {% for line in results[book].split('\n') %}
+                {% if line.find(keyword) != -1 %}
+                    <h3>
+                {% endif %}
+                {{ line.replace(keyword, '<b>' + keyword + '</b>').replace('--', '<hr/>') |safe}} </br>
+                {% if line.find(keyword) != -1 %}
+                    </h3>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        <p>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script>
+        $(function () {
+            $('#increase, #decrease').on('click', function () { // click to increase or decrease
+                var btn = $(this);
+                var fontSize = parseInt(window.getComputedStyle(document.body, null).fontSize, 0); // parse the body font size as a number
+                if (btn[0].id === "increase") { // detect the button being clicked
+                    fontSize += 5; // increase the base font size
+                } else {
+                    fontSize -= 5; // or decrease
+                }
+                document.body.style.fontSize = fontSize + 'px'; // set the body font size to the new value
+            });
+        });
+    </script>
+
+</body>
+
 </html>
